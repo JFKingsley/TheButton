@@ -2,7 +2,7 @@
   "name": "request-redis",
   "version": "1.0.0",
   "description": "A system for caching and sending HTTP requests using Redis",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,9 +11,15 @@
     "url": "https://github.com/JFKingsley/request-redis.git"
   },
   "author": "Jonathan Kingsley",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/JFKingsley/request-redis/issues"
   },
-  "homepage": "https://github.com/JFKingsley/request-redis"
+  "readmeFilename": "README.md",
+  "homepage": "https://github.com/JFKingsley/request-redis",
+  "dependencies": {
+    "hiredis": "^0.1.17",
+    "redis": "^0.10.3",
+    "request": "^2.36.0"
+  }
 }

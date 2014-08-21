@@ -18,13 +18,8 @@ var rqs = function () {
                 };
                 return callback(null);
             }, function(err){
-                // if any of the file processing produced an error, err would equal that error
-                if( err ) {
-                  // One of the iterations produced an error.
-                  // All processing will now stop.
-                  console.log('A file failed to process');
-                } else {
-                  console.log('All files have been processed successfully');
+                if (err) {
+                    throw new Error(err);
                 }
             });
         });

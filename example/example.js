@@ -6,6 +6,8 @@ request('http://httpbin.org/get', function (error, response, body) {
   }
 });
 
+request.setupRedisCache({});
+
 request.post({ url: 'http://httpbin.org/post',
                form: { foo: 'bar' } }, function (error, response, body) {
                 console.log(body);

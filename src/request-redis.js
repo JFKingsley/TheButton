@@ -3,8 +3,8 @@ var request      = require('request'),
     allowedFuncs = ['get', 'post', 'put', 'patch'];
 
 var rqs = function () {
-    if(!global.calledOnce) {
-        global.calledOnce = true;
+    if(!this.calledOnce) {
+        this.calledOnce = true;
         async.filter(Object.keys(request), function (key, cb) {
             cb(request[key] instanceof Function);
         }, function(results){

@@ -10,11 +10,10 @@ var rqs = function () {
         }, function(results){
             async.each(results, function(key, callback) {
                 rqs[key] = function () {
-                    //TODO figure out why this only fires once per function call
                     var $this   = this,
                         fn      = request[key],
                         args    = Array.prototype.slice.call(arguments);
-console.log(key);
+
                     setupFunctionWithCache($this, fn, args);
                 };
                 return callback(null);

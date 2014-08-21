@@ -1,7 +1,36 @@
-var request = require('request'),
+var request      = require('request'),
+    async        = require('async'),
     allowedFuncs = ['get', 'post', 'put', 'patch'];
 
 var rqs = function () {
+    if(!global.calledOnce) {
+        global.calledOnce = true;
+        async.filter(Object.keys(request), function (key, cb) {
+            cb(request[key] instanceof Function);
+        }, function(results){
+            async.each(results, function(key, callback) {
+                rqs[key] = function () {
+                    //TODO figure out why this only fires once per function call
+                    var $this   = this,
+                        fn      = request[key],
+                        args    = Array.prototype.slice.call(arguments);
+console.log(key);
+                    setupFunctionWithCache($this, fn, args);
+                };
+                return callback(null);
+            }, function(err){
+                // if any of the file processing produced an error, err would equal that error
+                if( err ) {
+                  // One of the iterations produced an error.
+                  // All processing will now stop.
+                  console.log('A file failed to process');
+                } else {
+                  console.log('All files have been processed successfully');
+                }
+            });
+        });
+    }
+
     var $this   = this,
         fn      = request,
         args    = Array.prototype.slice.call(arguments);
@@ -9,26 +38,11 @@ var rqs = function () {
         return setupFunctionWithCache($this, fn, args);
 };
 
-Object.keys(request).filter(function (key) {
-    return request[key] instanceof Function;
-}).forEach(function (key) {
-    var fn = request[key];
-    rqs[key] = function () {
-        console.log(key);
-        //TODO figure out why this only fires once per function call
-        var $this   = this,
-            args    = Array.prototype.slice.call(arguments);
-
-        setupFunctionWithCache($this, fn, args);
-    };
-
-});
-
 function setupFunctionWithCache(thisInstance, origFunc, args) {
     if (this.client) {
 
     } else {
-        return request.apply(thisInstance, args);
+        return origFunc.apply(thisInstance, args);
     }
 }
 

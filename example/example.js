@@ -5,9 +5,10 @@ request('http://httpbin.org/get', function (error, response, body) {
     console.log(body); // Print the google web page.
   }
 });
+
 request.post({ url: 'http://httpbin.org/post',
-               followAllRedirects: true,
                form: { foo: 'bar' } }, function (error, response, body) {
+                console.log(body);
   if (!error && response.statusCode == 200) {
     console.log(body); // Print the google web page.
   }

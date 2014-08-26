@@ -1,11 +1,12 @@
 var request      = require('request'),
     async        = require('async'),
+    redis        = require('redis'),
     allowedFuncs = ['get', 'post', 'put', 'patch'];
 
 var rqs = setupValues();
 
 function setupValues() {
-    var func = function() {
+    return function() {
         if(!this.calledOnce) {
             this.calledOnce = true;
 
@@ -43,12 +44,17 @@ function setupValues() {
             return fn.apply($this, args);
         }
     };
-
-    return func;
 }
 
 function setupFunctionWithCache(thisInstance, origFunc, args) {
-    return origFunc.apply(thisInstance, args);
+
+    var callback = args.pop();
+
+    args.push(function (err, res, body) {
+        callback(err, res, body);
+    });
+
+    origFunc.apply(thisInstance, args);
 }
 
 rqs.setupRedisCache = function(client, options) {

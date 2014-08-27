@@ -1,6 +1,7 @@
 var request      = require('request'),
     async        = require('async'),
     redis        = require('redis'),
+    url          = require('url'),
     crypto       = require('crypto'),
     Base64       = {encode:function(e){var b=new Buffer(e);return b.toString('base64');},decode:function(e){var b =new Buffer(e, 'base64'); return b.toString();}},
     allowedFuncs = ['get', 'post', 'put', 'patch'];
@@ -53,23 +54,34 @@ function setupValues() {
 function setupFunctionWithCache(thisInstance, origFunc, args) {
     if (args[0].cacheResponse && thisInstance.client) {
         var callback    = args.pop(),
-            argsHash = args[0];
+            argsHash    = Object.create(args[0]);
 
         delete argsHash.cacheResponse;
         delete argsHash.cacheExpiry;
-
+        //Create the redis key
         argsHash = JSON.stringify(argsHash);
         argsHash = crypto.createHash('sha1').update(argsHash).digest('hex');
 
-        var redisKey = [argsHash];
-
-        if (thisInstance.options.prefix && thisInstance.options.prefix instanceof String) {
-            key.unshift(thisInstance.options.prefix);
+        var redisKey = [url.parse(args[0].url).host, argsHash];
+        if (thisInstance.options.redisPrefix && typeof thisInstance.options.redisPrefix === 'string') {
+            redisKey.unshift(thisInstance.options.redisPrefix);
         }
-console.log(redisKey);
-        thisInstance.client.get(redisKey, function(err, reply) {
-            if (reply) {
 
+        redisKey = redisKey.join(':');
+
+        //Check if the body is currently cached
+        thisInstance.client.get(redisKey, function(err, reply) {
+            if (err) {
+                return callback("[Request-Redis] Failed to connect to redis cache.", null, null);
+            }
+
+            if (reply) {
+                //Unpack and return the cached response
+                var cachedResponse = JSON.parse(Base64.decode(
+                    reply
+                ));
+                cachedResponse.res.cachedResponse = true;
+                callback(cachedResponse.err, cachedResponse.res, cachedResponse.res.body);
             } else {
                 args.push(function (err, res, body) {
                     //Set all the header keys to lowercase, just to be sure
@@ -82,9 +94,9 @@ console.log(redisKey);
 
                     //Checks if there are any caching params set and obeys them
                     var canCache = true,
-                        expire   = args.cacheExpiry || 3600;
+                        expire   = args[0].cacheExpiry || 3600;
 
-                    if (!res.headers['cache-control'] || res.headers['cache-control'].split(',').indexOf('no-cache') > -1 || !res.headers.pragma || res.headers.pragma.toLowerCase() === 'no-cache' || res.headers['cache-control'].split(',').indexOf('private') > -1) {
+                    if ((res.headers['cache-control'] && res.headers['cache-control'].split(',').indexOf('no-cache') > -1) || (res.headers['cache-control'] && res.headers['cache-control'].split(',').indexOf('private') > -1) || (res.headers.pragma && res.headers.pragma.toLowerCase() === 'no-cache')) {
                         canCache = false;
                     }
 
@@ -92,10 +104,46 @@ console.log(redisKey);
                         canCache = true;
                     }
 
+                    if(args[0].cacheResponse) {
+                        canCache = true;
+                    }
+
+                    if (res.headers['cache-control']) {
+                        var maxAgeResult = res.headers['cache-control'].split(',').filter(function(item){
+                            return typeof item == 'string' && item.indexOf('max-age') > -1;
+                        });
+
+                        var expireResult = res.headers['cache-control'].split(',').filter(function(item){
+                            return typeof item == 'string' && item.indexOf('expires') > -1;
+                        });
+
+                        if (maxAgeResult !== [] && expire === 3600) {
+                            expire = parseInt(maxAgeResult.toString().replace(' ', '').split('=')[1]);
+                        }
+
+                        if (expireResult !== [] && expire === 3600) {
+                            expire = parseInt(expireResult.toString().replace(' ', '').split('=')[1]);
+                        }
+                    }
+
                     if (canCache) {
                         //Save body to cache
-                        console.log(body + redisKey);
-                        callback(err, res, body);
+                        res.cachedResponse = true;
+                        var fixedRes = res.toJSON();
+                        delete fixedRes.request.body;
+
+                        var resObj = Base64.encode(require('json-stringify-safe')({
+                            err: err,
+                            res: fixedRes
+                        }));
+                        //Save the data to redis with the appropriate expiry
+                        client.setex(redisKey, expire, resObj, function(err) {
+                            if(err) {
+                                callback("[Request-Redis] " + err, null, null);
+                            }
+
+                            callback(err, res, body);
+                        });
                     } else {
                         //Return the response with no caching
                         return callback(err, res, body);

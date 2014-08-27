@@ -7,9 +7,9 @@ request('http://httpbin.org/get', function (error, response, body) {
 });
 
 var redisConfig = {
-    host: "pub-redis-10914.us-east-1-3.3.ec2.garantiadata.com",
-    port: 10914,
-    password: "e3b0c44298fc1c1"
+    host: "",
+    port: 6968,
+    password: ""
 };
 
 request.setupRedisCache(redisConfig, {redisPrefix: "prefixOne"});

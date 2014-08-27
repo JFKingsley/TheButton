@@ -72,7 +72,7 @@ function setupFunctionWithCache(thisInstance, origFunc, args) {
         //Check if the body is currently cached
         thisInstance.client.get(redisKey, function(err, reply) {
             if (err) {
-                return callback("[Request-Redis] Failed to connect to redis cache.", null, null);
+                return callback("[RequestCache] Failed to connect to redis cache.", null, null);
             }
 
             if (reply) {
@@ -139,7 +139,7 @@ function setupFunctionWithCache(thisInstance, origFunc, args) {
                         //Save the data to redis with the appropriate expiry
                         client.setex(redisKey, expire, resObj, function(err) {
                             if(err) {
-                                callback("[Request-Redis] " + err, null, null);
+                                callback("[RequestCache] " + err, null, null);
                             }
 
                             callback(err, res, body);

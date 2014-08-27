@@ -1,5 +1,5 @@
 {
-  "name": "request-redis",
+  "name": "requestcache",
   "version": "1.0.0",
   "description": "A system for caching and sending HTTP requests using Redis",
   "main": "main.js",
@@ -8,18 +8,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/JFKingsley/request-redis.git"
+    "url": "https://github.com/JFKingsley/RequestCache.git"
   },
   "author": "Jonathan Kingsley",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JFKingsley/request-redis/issues"
+    "url": "https://github.com/JFKingsley/RequestCache/issues"
   },
   "readmeFilename": "README.md",
-  "homepage": "https://github.com/JFKingsley/request-redis",
+  "homepage": "https://github.com/JFKingsley/RequestCache",
   "dependencies": {
     "async": "^0.9.0",
-    "hiredis": "^0.1.17",
     "redis": "^0.10.3",
     "request": "^2.36.0"
   }

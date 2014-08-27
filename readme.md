@@ -49,3 +49,7 @@ It's that simple, you just drop it in, pass one config option though and bingo!
 The setupRedisCache function takes two parameters, the client and the options. Currently for the client you can pass through an object containing the details and it'll create one for you, or you can pass through a [node_redis](https://github.com/mranney/node_redis) client and it'll use that. 
 
 Currently the options only accept the redisPrefix option which adds a prefix to all redis entries.
+
+###Problem?
+
+Just file an issue or a PR to fix it and i'll take a look ASAP.

@@ -1,24 +1,19 @@
-var request = require('../main.js');
+var ButtonAPI = require('../main.js');
+var api = new ButtonAPI();
 
-request('http://httpbin.org/get', function (error, response, body) {
-  if (!(!error && response.statusCode == 200 && body)) {
-    console.log("FAILED!"); // Print the google web page.
-  }
-});
+api.getNewToken(function(tokenData) {
 
-var redisConfig = {
-    host: "",
-    port: 6968,
-    password: ""
-};
+    api.connect(tokenData.token, tokenData.epoch);
 
-request.setupRedisCache(redisConfig, {redisPrefix: "prefixOne"});
+    api.on('tick', function(data) {
+      console.log('tick');
+      console.log(data);
+    })
 
-request.get({cacheResponse: true, url: 'http://httpbin.org/get',
-               form: { foo: 'bar' } }, function (error, res, body) {
-  if (!error && res.statusCode == 200) {
-    console.log(body); // Print the google web page.
-  }
+    api.on('buttonReset', function(data) {
+      console.log('reset');
+      console.log(data);
+    })
 });
 
 console.log("Example Started");

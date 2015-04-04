@@ -1,1 +1,1 @@
-module.exports = require('./src/request-redis');
+module.exports = require('./src/ButtonAPI');

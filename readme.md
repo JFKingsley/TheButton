@@ -1,54 +1,36 @@
-RequestCache
+The Button API
 =====
 
-![RequestCache NPM](https://nodei.co/npm/requestcache.png)
+![TheButton NPM](https://nodei.co/npm/thebutton.png)
 
-> RequestCache is a drop-in replacement for the request module, which has the added ability to easily cache http responses to Redis.
+> The Button API is a simple, easy to use library for quickly gathering data from Reddit's The Button.
 ### Install
 ```bash
-$ npm install requestcache
+$ npm install thebutton
 ```
 
 ### Usage
 ```javascript
-var request = require('requestcache');
+var TheButton = require('thebutton');
 
-request('http://httpbin.org/get', function (error, response, body) {
-  if (!error && response.statusCode == 200) {
-    console.log("Standard request: " + body); // Print the google web page.
-  }
-});
+var api = new ButtonAPI('6903b1e79b5e5162fb792775eb187bc343824cd7', '1428256960');
 
-var redisConfig = {
-    host: "",
-    port: 6968,
-    password: ""
-};
+api.connect();
 
-request.setupRedisCache(redisConfig, {redisPrefix: "prefixOne"});
+api.on('tick', function(data) {
+  console.log('tick');
+})
 
-request.get({cacheResponse: true, url: 'http://httpbin.org/get',
-               form: { foo: 'bar' } }, function (error, res, body) {
-  if (!error && res.statusCode == 200) {
-    console.log("Caching body on this request: " + body); // Print the google web page.
-  }
-});
-
-request.get({cacheResponse: true, url: 'http://httpbin.org/get',
-               form: { foo: 'bar' } }, function (error, res, body) {
-  if (!error && res.statusCode == 200) {
-    console.log("Cached body: " + body); // Print the google web page.
-  }
-});
+api.on('buttonReset', function(data) {
+  console.log('reset');
+})
 ```
 
 It's that simple, you just drop it in, pass one config option though and bingo!
 
 ### Config
 
-The setupRedisCache function takes two parameters, the client and the options. Currently for the client you can pass through an object containing the details and it'll create one for you, or you can pass through a [node_redis](https://github.com/mranney/node_redis) client and it'll use that. 
-
-Currently the options only accept the redisPrefix option which adds a prefix to all redis entries.
+The initial creation function can take two parameters, a token and an epoch. This is to allow people to potentially enact clicking behaviour with user tokens, but as of the moment this appears to be impossible to work with the token reload mechanism
 
 ###Problem?
 

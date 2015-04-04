@@ -1,6 +1,6 @@
 {
   "name": "thebutton",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Node library for data on Reddit's The Button.",
   "main": "main.js",
   "scripts": {

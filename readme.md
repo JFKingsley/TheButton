@@ -32,6 +32,6 @@ It's that simple, you just drop it in, pass one config option though and bingo!
 
 The initial creation function can take two parameters, a token and an epoch. This is to allow people to potentially enact clicking behaviour with user tokens, but as of the moment this appears to be impossible to work with the token reload mechanism
 
-###Problem?
+### Problem?
 
 Just file an issue or a PR to fix it and i'll take a look ASAP.

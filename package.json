@@ -19,6 +19,7 @@
   "homepage": "https://github.com/JFKingsley/TheButton",
   "dependencies": {
     "request": "^2.54.0",
-    "ws": "^0.7.1"
+    "ws": "^0.7.1",
+    "cheerio": "^0.19.0"
   }
 }
